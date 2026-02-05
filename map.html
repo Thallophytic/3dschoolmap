@@ -1,0 +1,53 @@
+<head>
+
+</head>
+
+<!-- Include Three.js via CDN -->
+<script type="importmap">
+  { "imports": { "three": "https://cdn.jsdelivr.net" } }
+</script>
+
+<body>
+
+<div id="container"></div>
+<button onclick="toggleFloor('Floor_1')">Toggle Floor 1</button>
+
+<script type="module">
+  import * as San from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+  import { GLTFLoader } from 'https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
+  
+  // 1. Create the World
+  const scene = new San.Scene();
+  const camera = new San.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const renderer = new San.WebGLRenderer({ antialias: true });
+  renderer.setSize(500, 500);
+  document.getElementById('container').appendChild(renderer.domElement);
+
+  // 2. Add Lighting
+  const light = new San.DirectionalLight(0xffffff, 1);
+  light.position.set(5, 10, 7.5);
+  scene.add(light, new San.AmbientLight(0x404040));
+
+  // 3. Load your Building
+  const loader = new GLTFLoader();
+  let building;
+  loader.load('your-building.glb', (gltf) => {
+    building = gltf.scene;
+    scene.add(building);
+  });
+
+  camera.position.z = 5;
+
+  function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  // 4. THE INTERACTION: Toggle visibility by floor name
+  window.toggleFloor = function(floorName) {
+    const floor = building.getObjectByName(floorName); // Finds "Floor_1" inside the model
+    if (floor) floor.visible = !floor.visible;
+  };
+</script>
+</body>
